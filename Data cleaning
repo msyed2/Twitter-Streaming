@@ -1,0 +1,59 @@
+from __future__ import division
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+import nltk
+import unicodedata as uc
+
+
+#threshold = 0.5
+tweets_data = []
+tweets_file = open("data1.txt", "r")
+for line in tweets_file:
+    try:
+        tweet = json.loads(line)
+        tweets_data.append(tweet)
+    except:
+        continue
+stpwrds = nltk.corpus.stopwords.words('english')
+print stpwrds, type(stpwrds)
+for i in xrange(0, len(stpwrds)):
+    stpwrds[i] = stpwrds[i].encode('ascii', errors='xmlcharrefreplace')
+print len(tweets_data)
+stpwrds=set(stpwrds)
+print stpwrds, type(stpwrds)
+fv=[]
+for tweet in tweets_data:
+    
+    #print tweet['text']
+    #try:
+    #uc.normalize('NFKD', encoded)
+    #tweet['text'].decode("utf-8")
+    #print tweet
+    tweet = tweet['text'].encode('ascii', errors='xmlcharrefreplace')
+    
+    #print tweet, type(tweet)
+    text = re.sub(r"(?:\@|https?\://)\S+", "", tweet)
+    #text = re.sub(r"(?:%s)\S*" % "|".join(map(re.escape, chain(urls, users))), "", tweet)
+    #print text, type(text)
+    tokens = nltk.word_tokenize(text)
+    if tokens[0] == "RT":
+        tokens.remove("RT")
+    #tokens = [w for w in tokens if not w in stpwrds]
+    #print tokens
+    for i in xrange(0, len(tokens)):
+        #print i
+        if tokens[i].lower() in stpwrds:
+            #print tokens[i]
+            tokens.remove(tokens[i])
+        #print "len,", len(tokens)
+        if i+1 == len(tokens):
+            break
+    #print temp, type(temp)
+    
+    print tokens, type(tokens)
+    fv.append(tokens)
+    feat = open("featurevector.txt","w")
+    for i in xrange(0, len(fv)):
+        feat.write(fv[i])
